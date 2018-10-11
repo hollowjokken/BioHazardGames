@@ -1,0 +1,33 @@
+.content {
+    padding: 20px 40%;
+    text-align: center;
+}
+
+.main-board {
+    width: 100%;
+    text-align: center;
+}
+
+.center {
+    padding: 20px 0;
+    text-align: center;
+}
+
+#main-board-table {
+    background-color: grey;
+    width: 100%;
+    table-layout: fixed;
+}
+
+td {
+    border: 3px solid black;
+    text-align: center;
+}
+
+td:hover {
+    background-color: antiquewhite;
+}
+
+td:after {
+    content: "\00A0";
+}
