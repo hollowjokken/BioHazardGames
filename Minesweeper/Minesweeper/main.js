@@ -2,12 +2,6 @@ let tableMines;
 let tableValues;
 let tableData;
 
-// console.log('TCL: tableData', tableData);
-
-// console.log('TCL: tableValues', tableValues);
-
-// console.log('TCL: tableMines', tableMines);
-
 function generateMines() {
     let randomMines = []
     while (randomMines.length < 8) {
@@ -79,7 +73,7 @@ function createMinesweeperTable() {
     let id = 0;
     let mainTabel = `<table id="main-board-table">`;
     for (let j = 1; j <= 8; j++) {
-        mainTabel += `<tr id=${j}>`;
+        mainTabel += `<tr id=tr${j}>`;
         for (let i = 1; i <= 8; i++) {
             // mainTabel += `<td id=${id}>${tableData[j][i].value}</td>`;
             // mainTabel += `<td id=${id}>${tableData[id].value}</td>`;
@@ -92,17 +86,54 @@ function createMinesweeperTable() {
     return mainTabel;
 }
 
-
 function findElem(id) {
     let val;
-    tableData.forEach(row => {
-        row.forEach(cell => {
+    tableData.forEach((row, i) => {
+        row.forEach((cell, j) => {
             if (cell.id === id) {
                 val = cell;
+                val.i = i;
+                val.j = j;
             }
         })
     });
     return val;
+}
+
+function showZone(location) {
+
+    if (location.hidden) {
+        location.hidden = false;
+
+        if (location.value !== 0) {
+            $(`#${location.id}`).text(location.value).css("background-color", "white");
+            return;
+        }
+
+        for (let i = -1; i <= 1; i++) {
+            for (let j = -1; j <= 1; j++) {
+                if (tableData[location.i + i][location.j + j].value !== 'R') {
+                    $(`#${location.id}`).text(location.value).css("background-color", "white");
+                    if (i !== 0 || j !== 0) {
+                        showZone(findElem(tableData[location.i + i][location.j + j].id));
+                    }
+                }
+            }
+        }
+    }
+    return;
+}
+
+function winner(stage) {
+    let cell;
+    for (let i = 0; i < stage; i++) {
+        cell = findElem(i);
+        console.log('TCL: winner -> cell', cell);
+        if (cell.value !== 'B' && cell.hidden === true) {
+            return false;
+        }
+    }
+    return true;
 }
 
 function restartGame() {
@@ -113,7 +144,7 @@ function restartGame() {
 
     $('#minesweeper-table').append(createMinesweeperTable());
 }
-$('#resetBtn').click(() => restartGame());
+$('#resetBtn').click(() => { location.reload() });
 
 restartGame();
 
@@ -122,22 +153,19 @@ $('#main-board-table').click((e) => {
     let chosen = findElem(parseInt(target.id));
 
     if ($(target).is('td')) {
-        $(target).text(chosen.value);
         if (chosen.value === 'B') {
+            $(target).css("background-color", "red");
             alert('LOSE!!!')
-            restartGame();
+                // restartGame();
             location.reload();
         } else {
-
+            showZone(chosen);
         }
     }
 
-    // if ($(target).is('td') && jQuery.inArray(parseInt(target.id), tableMines) != -1) {
-    //     console.log('BOOOOOM!!!TCL: target', target.id);
-    //     alert('LOSE!!!')
-    // } else {
-    //     console.log('OKKKKKK!!!TCL: target', target.id);
-
-    // }
+    if (winner(8 * 8)) {
+        alert('Winner!!!');
+        location.reload();
+    }
 
 })
