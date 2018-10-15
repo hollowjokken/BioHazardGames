@@ -29,7 +29,7 @@ td {
 }
 
 td:hover {
-    background-color: antiquewhite;
+    background-color: rgb(75, 243, 255);
 }
 
 td:after {

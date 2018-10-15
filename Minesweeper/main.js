@@ -119,7 +119,7 @@ function showZone(location) {
         for (let i = -1; i <= 1; i++) {
             for (let j = -1; j <= 1; j++) {
                 if (tableData[location.i + i][location.j + j].value !== 'R') {
-                    $(`#${location.id}`).text(location.value).css("background-color", "white");
+                    $(`#${location.id}`).css("background-color", "white").text('');
                     if (i !== 0 || j !== 0) {
                         showZone(findElem(tableData[location.i + i][location.j + j].id));
                     }
@@ -134,7 +134,12 @@ function winner() {
     let cell;
     for (let i = 0; i < (tableRows * tableCells); i++) {
         cell = findElem(i);
+
+        console.log('TCL: winner -> $(`${cell.id}`).text !== !', $(`${cell.id}`).text !== '!');
+        console.log('TCL: winner -> cell.value === B', cell.value === 'B');
         if (cell.value !== 'B' && cell.hidden === true) {
+            return false;
+        } else if ((cell.value === 'B') && $(`${cell.id}`).text !== '!') {
             return false;
         }
     }
@@ -159,6 +164,22 @@ function restartGame(difficulty) {
     tableValues = generateTableValues(tableMines);
     tableData = generateFullTabelData(tableValues);
 
+    $('#main-board-table').contextmenu((e) => {
+        let target = e.target;
+        let chosen = findElem(parseInt(target.id));
+
+        if (chosen.hidden === true) {
+            $(`#${target.id}`).text() === '!' ? $(`#${target.id}`).text('') : $(`#${target.id}`).text('!');
+        }
+
+        if (winner()) {
+            $('#main-board-table').css({ "pointer-events": "none" });
+            setTimeout(() => { alert('Winner!!!') });
+        }
+        e.preventDefault();
+        e.stopImmediatePropagation();
+    });
+
     $('#main-board-table').click((e) => {
         let target = e.target;
         let chosen = findElem(parseInt(target.id));
@@ -178,9 +199,7 @@ function restartGame(difficulty) {
             $('#main-board-table').css({ "pointer-events": "none" });
             setTimeout(() => { alert('Winner!!!') });
         }
-
     })
-
 }
 
 $('#resetBtn').click(() => {
