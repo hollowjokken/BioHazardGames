@@ -134,12 +134,9 @@ function winner() {
     let cell;
     for (let i = 0; i < (tableRows * tableCells); i++) {
         cell = findElem(i);
-
-        console.log('TCL: winner -> $(`${cell.id}`).text !== !', $(`${cell.id}`).text !== '!');
-        console.log('TCL: winner -> cell.value === B', cell.value === 'B');
         if (cell.value !== 'B' && cell.hidden === true) {
             return false;
-        } else if ((cell.value === 'B') && $(`${cell.id}`).text !== '!') {
+        } else if ((cell.value === 'B') && $(`#${cell.id}`).text() !== '!') {
             return false;
         }
     }
@@ -168,8 +165,10 @@ function restartGame(difficulty) {
         let target = e.target;
         let chosen = findElem(parseInt(target.id));
 
-        if (chosen.hidden === true) {
-            $(`#${target.id}`).text() === '!' ? $(`#${target.id}`).text('') : $(`#${target.id}`).text('!');
+        if (chosen) {
+            if (chosen.hidden === true) {
+                $(`#${target.id}`).text() === '!' ? $(`#${target.id}`).text('') : $(`#${target.id}`).text('!');
+            }
         }
 
         if (winner()) {
@@ -207,4 +206,8 @@ $('#resetBtn').click(() => {
     restartGame(difficulty);
 });
 
-restartGame(parseInt($("#game-level").val()));
+$('#game-level').change((e) => {
+    restartGame(parseInt($('#game-level').val()));
+});
+
+restartGame(parseInt($('#game-level').val()));
