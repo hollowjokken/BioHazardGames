@@ -1,0 +1,41 @@
+.center {
+    padding: 20px 0;
+    text-align: center;
+}
+
+#sudoku-table {
+    padding: 20px 0;
+    width: auto;
+    text-align: center;
+}
+
+#main-table {
+    /* background-color: grey; */
+    text-align: center;
+    margin: auto;
+}
+
+td {
+    border: 1px solid whitesmoke;
+    padding: 0;
+    text-align: center;
+    width: 20px;
+}
+
+td:nth-child(3),
+td:nth-child(6) {
+    border-right: 1px solid black;
+}
+
+tr:nth-child(3) td,
+tr:nth-child(6) td {
+    border-bottom: 1px solid black;
+}
+
+td:hover {
+    background-color: rgb(75, 243, 255);
+}
+
+input {
+    width: 15px;
+}
