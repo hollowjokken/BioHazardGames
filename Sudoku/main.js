@@ -6,9 +6,8 @@ class Game {
     createTable(width) {
         let table = this.createElement('table', 'main-table');
         let id = 0;
-
         for (let i = 0; i < width; i++) {
-            this.sudokuTable.push([])
+            this.sudokuTable.push([]);
             let tr = this.createElement('tr', `tr${i}`);
             for (let j = 0; j < width; j++) {
                 let input = this.createElement('input', `${id}`);
@@ -16,7 +15,6 @@ class Game {
                 td.appendChild(input);
                 tr.appendChild(td);
                 id++;
-                this.sudokuTable[i][j] = 0;
             }
             table.appendChild(tr);
         }
@@ -27,11 +25,9 @@ class Game {
         const element = document.createElement(tag);
         if (id) {
             element.setAttribute('id', id);
-            element.setAttribute('value', id);
         }
         return element;
     }
-
     shuffleSudokuValues(a) {
         for (let i = a.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -41,27 +37,27 @@ class Game {
     }
 
     nullSudokuTable() {
-        const randomValues = this.shuffleSudokuValues([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+        // let randomValues = this.shuffleSudokuValues([1, 2, 3, 4, 5, 6, 7, 8, 9]);
         let id = 0;
-        console.log('TCL: Game -> nullSudokuTable -> randomValues', randomValues);
 
         for (let i = 0; i < this.sudokuTable.length; i++) {
             for (let j = 0; j < this.sudokuTable.length; j++) {
                 this.sudokuTable[i][j] = {
                     id,
-                    value: 0,
-                    randomValues
+                    value: 0
                 };
                 id++;
             }
         }
     }
 
-    popValueFromArray(array, value) {
-        let index = array.indexOf(value);
-        if (index > -1)
-            array.splice(index, 1);
-        return array;
+    popValueFromArray(randomArray, value) {
+        let newRandomArray = [];
+        randomArray.forEach(element => {
+            if (!(element === value))
+                newRandomArray.push(element);
+        });
+        return newRandomArray;
     }
 
     restrictAwaylabelValues(value, i, j) {
@@ -82,46 +78,64 @@ class Game {
         }
     }
 
-    addSomeRandomValues() {
-        this.nullSudokuTable();
-        console.log('TCL: BEFORE Game -> addSomeRandomValues -> this.sudokuTable[i][j]', this.sudokuTable);
+    logTable() {
         for (let i = 0; i < this.sudokuTable.length; i++) {
             for (let j = 0; j < this.sudokuTable.length; j++) {
-                this.sudokuTable[i][j].value = this.sudokuTable[i][j].randomValues[0];
-                this.restrictAwaylabelValues(this.sudokuTable[i][j].value, i, j);
-
-
-                // console.log('TCL: Game -> addSomeRandomValues -> this.sudokuTable[i][j].value', this.sudokuTable[i][j].value);
-                // console.log('TCL: Game -> addSomeRandomValues -> this.sudokuTable[i][j].id}', this.sudokuTable[i][j].id);
-                // const inputId = document.getElementById(`${this.sudokuTable[i][j].id}`);
-                // console.log('TCL: Game -> addSomeRandomValues -> inputId', inputId);
-                // inputId.value = this.sudokuTable[i][j].value;
-
-                // let selectFromValues = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-                // let found = false;
-
-                // while (selectFromValues.length !== 0) {
-                //     let selectedValue = Math.floor((Math.random() * selectFromValues.length) + 1)
-                //     this.sudokuTable[i][j] = selectedValue;
-
-                //     if (this.isOneInLine(i, j) && this.isOneInTheHood(i, j)) {
-                //         found = true;
-                //         break;
-                //     }
-                //     let index = selectFromValues.indexOf(selectedValue);
-                //     selectFromValues.splice(index, 1);
-                // }
-                // if (!found) {
-                //     console.log('TCL: Game -> addSomeRandomValues -> this.sudokuTable', this.sudokuTable);
-                //     // this.nullSudokuTable();
-                //     this.sudokuTable[i].forEach(elem => {
-                //         elem = 0;
-                //     });
-                //     j = 0;
-                // }
+                this.sudokuTable[i][j]
+                console.log('TCL: Game -> logTable -> this.sudokuTable[i][x]', this.sudokuTable[i][j]);
             }
         }
-        console.log('TCL: BEFORE Game -> addSomeRandomValues -> this.sudokuTable[i][j]', this.sudokuTable);
+    }
+
+    switchHoodElements(randomArray) {
+        for (let i = 0; i < 3; i++) {
+            randomArray.unshift(randomArray.pop());
+
+        }
+        return randomArray;
+    }
+
+    mixUpHoodElements(randomArray) {
+        randomArray.unshift(randomArray.pop());
+        return randomArray
+    }
+
+    fragmentArray(randomArray) {
+        let finalArrayForm = [];
+        let exchangeArray = [];
+        for (let index = 0; index < randomArray.length; index++) {
+            exchangeArray.push(randomArray[index]);
+            if (index % 3 == 2) {
+                exchangeArray = this.mixUpHoodElements(exchangeArray);
+
+                finalArrayForm = finalArrayForm.concat(exchangeArray);
+                exchangeArray = [];
+            }
+        }
+        return finalArrayForm;
+    }
+
+    addSomeRandomValues() {
+        this.nullSudokuTable();
+        // console.log('TCL: Game -> addSomeRandomValues ->  this.sudokuTable', this.sudokuTable);
+
+        let randomValues = this.shuffleSudokuValues([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+        // randomValues = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+        for (let i = 0; i < this.sudokuTable.length; i++) {
+            for (let j = 0; j < this.sudokuTable.length; j++) {
+                this.sudokuTable[i][j].value = randomValues[j];
+                if (Math.random() >= 0.6) {
+                    const inputId = document.getElementById(`${this.sudokuTable[i][j].id}`);
+                    inputId.value = this.sudokuTable[i][j].value;
+                }
+            }
+            randomValues = this.switchHoodElements(randomValues);
+            if (i % 3 == 2) {
+                randomValues = this.fragmentArray(randomValues);
+            }
+        }
+        // console.log('TCL: Game -> addSomeRandomValues ->  this.sudokuTable', this.sudokuTable);
     }
 
     isOneInLine(i, j) {
@@ -178,10 +192,10 @@ function startGame() {
     const game = new Game();
     const gameTabel = game.createTable(9);
 
-    game.addSomeRandomValues();
 
     gameTabel.setAttribute('id', 'main-table');
     tableParent.appendChild(gameTabel)
+    game.addSomeRandomValues();
 
 }
 
@@ -206,4 +220,31 @@ function testMA_TA() {
     }
 }
 
-// testMA_TA();
+// testMA_TA(); 
+// this.restrictAwaylabelValues(this.sudokuTable[i][j].value, i, j);
+
+// const inputId = document.getElementById(`${this.sudokuTable[i][j].id}`);
+// inputId.value = this.sudokuTable[i][j].value;
+
+// let selectFromValues = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+// let found = false;
+
+// while (selectFromValues.length !== 0) {
+//     let selectedValue = Math.floor((Math.random() * selectFromValues.length) + 1)
+//     this.sudokuTable[i][j] = selectedValue;
+
+//     if (this.isOneInLine(i, j) && this.isOneInTheHood(i, j)) {
+//         found = true;
+//         break;
+//     }
+//     let index = selectFromValues.indexOf(selectedValue);
+//     selectFromValues.splice(index, 1);
+// }
+// if (!found) {
+//     console.log('TCL: Game -> addSomeRandomValues -> this.sudokuTable', this.sudokuTable);
+//     // this.nullSudokuTable();
+//     this.sudokuTable[i].forEach(elem => {
+//         elem = 0;
+//     });
+//     j = 0;
+// }
