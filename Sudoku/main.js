@@ -125,9 +125,10 @@ class Game {
         for (let i = 0; i < this.sudokuTable.length; i++) {
             for (let j = 0; j < this.sudokuTable.length; j++) {
                 this.sudokuTable[i][j].value = randomValues[j];
-                if (Math.random() >= 0.6) {
+                if (Math.random() >= 0.7) {
                     const inputId = document.getElementById(`${this.sudokuTable[i][j].id}`);
                     inputId.value = this.sudokuTable[i][j].value;
+                    inputId.disabled = true;
                 }
             }
             randomValues = this.switchHoodElements(randomValues);
