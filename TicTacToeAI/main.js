@@ -44,10 +44,28 @@ class AIPlayer extends Player {
         this.positins = [];
     }
 
+    dumbMove(table) {
+        const gameTable = table.querySelectorAll("td");
+        let finished = false;
+        let i = 0;
+        while (i < gameTable.length && !finished) {
+            if (gameTable[i].innerHTML === '') {
+                gameTable[i].innerHTML = this.playerType;
+                finished = !finished;
+            }
+            i++;
+
+        }
+
+        // gameTable.forEach(cell => {
+        //     console.log('TCL: AIPlayer -> move -> cell', cell.innerHTML);
+        // })
+    }
+
     isWinning(player) {
-        if (player.length === 0) {
+        if (player.length !== 0) {
             let isWinning = false;
-            let locations = []
+            let place = []
             let found;
 
             winningCondition.forEach((condition) => {
@@ -58,17 +76,17 @@ class AIPlayer extends Player {
                             found++;
                             if (found === 2) {
                                 isWinning = true;
-                                locations.push(condition);
+                                place.push(condition);
                             }
                             if (found === 3) {
-                                locations.pop(condition);
+                                place.pop(condition);
                             }
                         }
                     });
                 });
             });
             if (isWinning)
-                return { location };
+                return { place };
         } else
             return false;
 
@@ -85,7 +103,7 @@ class AIPlayer extends Player {
             });
         });
 
-        console.log('TCL: AIPlayer -> getTheBestSpot -> gameTable', gameTable);
+        // console.log('TCL: AIPlayer -> getTheBestSpot -> gameTable', gameTable);
         gameTable.forEach((cell) => {
             if (cell.innerHTML != '') {
                 allSpots.forEach(spot => {
@@ -95,48 +113,51 @@ class AIPlayer extends Player {
                 });
             }
         });
-        console.log('TCL: AIPlayer -> getTheBestSpot -> avaylableSpots', avaylableSpots);
+        // console.log('TCL: AIPlayer -> getTheBestSpot -> avaylableSpots', avaylableSpots);
 
     }
 
-    moveIA(isWinning, player) {
-        location = winningCondition;
+    moveIA(table, isWinning, player) {
+        // location = winningCondition;
         if (isWinning) {
-            isWinning.locations.forEach((location) => {
-                let positin = document.getElementById(`${location}`);
+            console.log('TCL: AIPlayer -> moveIA -> isWinning', isWinning);
+            isWinning.forEach((place) => {
+                console.log('TCL: AIPlayer -> moveIA -> place', place);
+                let positin = document.getElementById(`${place}`);
+                console.log('TCL: AIPlayer -> moveIA -> positin', positin);
                 if (positin.innerHTML === '') {
                     this.move(positin);
                 }
             })
         } else {
-            winningCondition.forEach((condition) => {
-                found = 0;
-                condition.forEach((value) => {
-                    player.forEach((play) => {
-                        if (value === play) {
-                            locations.pop(condition);
-                        }
-                    });
-                });
-            });
+            this.dumbMove(table);
+            // winningCondition.forEach((condition) => {
+            //     found = 0;
+            //     condition.forEach((value) => {
+            //         player.forEach((play) => {
+            //             if (value === play) {
+            //                 locations.pop(condition);
+            //             }
+            //         });
+            //     });
+            // });
 
+            // let modeMap = {};
+            // let maxEl = array[0],
+            //     maxCount = 1;
 
-            let modeMap = {};
-            let maxEl = array[0],
-                maxCount = 1;
-
-            for (let i = 0; i < array.length; i++) {
-                let el = array[i];
-                if (modeMap[el] == null)
-                    modeMap[el] = 1;
-                else
-                    modeMap[el]++;
-                if (modeMap[el] > maxCount) {
-                    maxEl = el;
-                    maxCount = modeMap[el];
-                }
-            }
-            return maxEl;
+            // for (let i = 0; i < array.length; i++) {
+            //     let el = array[i];
+            //     if (modeMap[el] == null)
+            //         modeMap[el] = 1;
+            //     else
+            //         modeMap[el]++;
+            //     if (modeMap[el] > maxCount) {
+            //         maxEl = el;
+            //         maxCount = modeMap[el];
+            //     }
+            // }
+            // return maxEl;
 
 
         }
@@ -237,11 +258,12 @@ table.addEventListener('click', (ev) => {
         // playerTurn = playerXTurn ? playerX : playerO;
         // playerTurn.move(ev.target);
         playerX.move(ev.target);
-        playerO.isWinning(playerO.getMoves(table));
+        playerO.moveIA(table, playerO.isWinning(playerO.getMoves(table)));
+        // playerO.isWinning(playerO.getMoves(table));
         console.log('TCL: playerO.getMoves(table)', playerO.getMoves(table));
-        console.log('TCL: playerO.isWinning(O);', playerO.isWinning('O'));
+        console.log('TCL: playerO.isWinning(O);', playerO.isWinning(playerO.getMoves(table)));
         // playerO.isWinning('X');
-        console.log('TCL: playerO.isWinning(X)', playerO.isWinning('X'));
+        // console.log('TCL: playerO.isWinning(X)', playerO.isWinning('X'));
         playerO.getTheBestSpot(table);
         winner = game.getWinner(playerX.getMoves(table));
 
