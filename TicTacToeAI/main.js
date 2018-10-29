@@ -45,8 +45,8 @@ class AIPlayer extends Player {
         this.positins = [];
     }
 
-    dumbMove(table) {
-        const gameTable = table.querySelectorAll("td");
+    dumbMove() {
+        const gameTable = this.getGameStatus();
         let finished = false;
         let i = 0;
         while (i < gameTable.length && !finished) {
@@ -100,37 +100,12 @@ class AIPlayer extends Player {
             }
         })
 
-        console.log('TCL: isWinning -> place', { place });
         if (isWinning) {
             return place;
         } else
             return false;
     }
 
-    getTheBestSpot() {
-        const gameTable = this.getGameStatus();
-        let allSpots = [];
-        let avaylableSpots = [];
-
-        winningCondition.forEach(condition => {
-            condition.forEach(value => {
-                allSpots.push(value);
-            });
-        });
-
-        // console.log('TCL: AIPlayer -> getTheBestSpot -> gameTable', gameTable);
-        gameTable.forEach((cell) => {
-            if (cell.innerHTML != '') {
-                allSpots.forEach(spot => {
-                    if (spot === cell.id) {
-
-                    }
-                });
-            }
-        });
-        // console.log('TCL: AIPlayer -> getTheBestSpot -> avaylableSpots', avaylableSpots);
-
-    }
 
     finalStand(lastMove) {
         lastMove.forEach((place) => {
@@ -141,7 +116,7 @@ class AIPlayer extends Player {
         })
     }
 
-    moveIA(table) {
+    moveAI() {
         // location = winningCondition;
         const isAIWinning = this.isWinning(this.playerType);
         const humanPlayer = this.playerType === 'O' ? 'X' : 'O';
@@ -152,7 +127,7 @@ class AIPlayer extends Player {
         } else if (isHuWinning) {
             this.finalStand(isHuWinning[0]);
         } else {
-            this.dumbMove(table);
+            this.dumbMove();
             // winningCondition.forEach((condition) => {
             //     found = 0;
             //     condition.forEach((value) => {
@@ -184,9 +159,31 @@ class AIPlayer extends Player {
 
         }
     }
+    getTheBestSpot() {
+        const gameTable = this.getGameStatus();
+        let allSpots = [];
+        let avaylableSpots = [];
+
+        winningCondition.forEach(condition => {
+            condition.forEach(value => {
+                allSpots.push(value);
+            });
+        });
+
+        // console.log('TCL: AIPlayer -> getTheBestSpot -> gameTable', gameTable);
+        gameTable.forEach((cell) => {
+            if (cell.innerHTML != '') {
+                allSpots.forEach(spot => {
+                    if (spot === cell.id) {
+
+                    }
+                });
+            }
+        });
+        // console.log('TCL: AIPlayer -> getTheBestSpot -> avaylableSpots', avaylableSpots);
+
+    }
 }
-
-
 class Game {
     constructor(table, playerTurn) {
         this.table = table;
@@ -245,29 +242,27 @@ let game = new Game(table);
 let playerX;
 let playerO;
 
-// const playerStart = Math.random() < 0.5 ? true : false;
+function resetGame() {
+    game.restartGame(table);
+    playerStart = Math.random() < 0.5 ? true : false;
+    if (playerStart) {
+        playerX = new Player('X');
+        playerO = new AIPlayer('O', table);
 
-// if (playerStart) {
-playerX = new Player('X');
-playerO = new AIPlayer('O', table);
-// } else {
-//     playerX = new AIPlayer('X');
-//     playerO = new Player('O');
-//     playerX.moveIA();
-// }
+    } else {
+        playerX = new AIPlayer('X', table);
+        playerO = new Player('O');
+        playerX.moveAI();
+    }
 
+}
+
+resetGame();
 
 console.log('TCL: playerX', playerX);
 console.log('TCL: playerO', playerO);
 
-
-
-// const playerX = new Player('X');
-// const playerO = new Player('0');
 let playerXTurn = false;
-
-let winner = false;
-
 
 table.addEventListener('click', (ev) => {
 
@@ -276,53 +271,39 @@ table.addEventListener('click', (ev) => {
         if (!game.gameNotStarted()) {
             playerXTurn = true;
         }
+        if (playerX instanceof AIPlayer) {
+            console.log('TCL: if');
+            playerO.move(ev.target);
+            playerX.moveAI();
+
+        } else {
+            console.log('TCL: else');
+            playerX.move(ev.target);
+            playerO.moveAI();
+        }
 
         // playerTurn = playerXTurn ? playerX : playerO;
         // playerTurn.move(ev.target);
-        playerX.move(ev.target);
-        playerO.moveIA(table, playerO.isWinning(playerO.getPlayer()));
         // playerO.isWinning(playerO.getMoves(table));
         // console.log('TCL: playerO.getMoves(table)', playerO.getMoves(table));
         // console.log('TCL: playerO.isWinning(O);', playerO.isWinning(playerO.getMoves(table)));
         // playerO.isWinning('X');
         // console.log('TCL: playerO.isWinning(X)', playerO.isWinning('X'));
-        playerO.getTheBestSpot(table);
-        huWinner = game.getWinner(playerX.getMoves(table));
-        aiWinner = game.getWinner(playerO.getMoves(table));
+        // playerO.getTheBestSpot(table);
+        // huWinner = game.getWinner(playerX.getMoves(table));
+        // aiWinner = game.getWinner(playerO.getMoves(table));
 
-        if (huWinner) {
+        if (game.getWinner(playerX.getMoves(table))) {
             setTimeout(() => {
                 alert(`WINNER!!! ${playerX.getPlayer()}`);
-
-                if (window.confirm('Game will reset!')) {
-                    // playerStart = Math.random() < 0.5 ? true : false;
-                    // if (playerStart) {
-                    // playerX = new Player('X');
-                    // playerO = new AIPlayer('O');
-                    // } else {
-                    //     playerX = new AIPlayer('X');
-                    //     playerO = new Player('O');
-                    //     playerX.moveIA();
-                    // }
-                    game.restartGame(table);
-                } else {
-                    // playerStart = Math.random() < 0.5 ? true : false;
-                    // if (playerStart) {
-                    // playerX = new Player('X');
-                    // playerO = new AIPlayer('O');
-                    // } else {
-                    //     playerX = new AIPlayer('X');
-                    //     playerO = new Player('O');
-                    //     playerX.movmoveIAe();
-                    // }
-                    game.restartGame(table);
-                }
+                resetGame()
             });
-        } else if (aiWinner) {
+        }
+        if (game.getWinner(playerO.getMoves(table))) {
             setTimeout(() => {
                 alert(`WINNER!!! ${playerO.getPlayer()}`);
-                game.restartGame(table);
-            })
+                resetGame()
+            });
 
         }
 
@@ -330,18 +311,4 @@ table.addEventListener('click', (ev) => {
     }
 })
 
-resetBtn.addEventListener('click', () => {
-    game.restartGame(table);
-
-    // playerStart = Math.random() < 0.5 ? true : false;
-    // if (playerStart) {
-    playerX = new Player('X');
-    playerO = new AIPlayer('O', table);
-
-    // } else {
-    //     playerX.moveIA();
-    //     playerX = new AIPlayer('X');
-    //     playerO = new Player('O');
-    // }
-
-});
+resetBtn.addEventListener('click', () => resetGame());
